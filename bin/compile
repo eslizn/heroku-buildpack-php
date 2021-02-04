@@ -391,7 +391,7 @@ export HEROKU_PHP_DEFAULT_RUNTIME_VERSION
 	fi
 }
 
-cat `cat $build_dir/.heroku/php/composer.json`
+status `cat $build_dir/.heroku/php/composer.json`
 
 # reset COMPOSER for the platform install step
 COMPOSER_bak="$COMPOSER"
