@@ -358,6 +358,9 @@ else
 	HEROKU_PHP_DEFAULT_RUNTIME_VERSION="^7.0.0"
 fi
 export HEROKU_PHP_DEFAULT_RUNTIME_VERSION
+
+status "$HEROKU_PHP_PLATFORM_REPOSITORIES"
+
 # extract requirements from composer.lock
 /app/.heroku/php-min/bin/php $bp_dir/bin/util/platform.php "$bp_dir/support/installer/" $HEROKU_PHP_PLATFORM_REPOSITORIES 2>&1 >$build_dir/.heroku/php/composer.json | indent || {
 	code=$?
@@ -390,7 +393,7 @@ export HEROKU_PHP_DEFAULT_RUNTIME_VERSION
 		error "$composer_lock_parse_error"
 	fi
 }
-
+status `cat $build_dir/.heroku/php/composer.json`
 # reset COMPOSER for the platform install step
 COMPOSER_bak="$COMPOSER"
 export COMPOSER=composer.json
@@ -403,7 +406,6 @@ export profile_dir_path=$build_dir/.profile.d
 if composer install -d "$build_dir/.heroku/php" ${HEROKU_PHP_INSTALL_DEV-"--no-dev"} 2>&1 | tee $build_dir/.heroku/php/install.log | ( grep --line-buffered -E '^  - (Instal|Enab)ling heroku-sys/' | sed -u -E -e 's/^  - (Instal|Enab)ling /- /' -e 's/heroku-sys\///g' || true ) | indent; then
 	:
 else
-	status `cat $build_dir/.heroku/php/install.log`
 	code=$?
 	install_log=$(
 		cat $build_dir/.heroku/php/install.log | sed -E \
